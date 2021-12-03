@@ -127,25 +127,25 @@ pub mod tests {
     use crate::day_1::{parse, part_1, part_2};
 
     #[test]
-    pub fn test_example_part1() {
+    pub fn test_day_1_example_part1() {
         let inputs = "199\n200\n208\n210\n200\n207\n240\n269\n260\n263";
         assert_eq!(part_1(&parse(inputs)), 7);
     }
 
     #[test]
-    pub fn test_example_part2() {
+    pub fn test_day_1_example_part2() {
         let inputs = "199\n200\n208\n210\n200\n207\n240\n269\n260\n263";
         assert_eq!(part_2(&parse(inputs)), 5);
     }
 
     #[test]
-    pub fn test_part_1() {
+    pub fn test_day_1_part_1() {
         const INPUT_DATA: &'static str = include_str!("input/day_1.txt");
         assert_eq!(part_1(&parse(INPUT_DATA)), 1184);
     }
 
     #[test]
-    pub fn test_part_2() {
+    pub fn test_day_1_part_2() {
         const INPUT_DATA: &'static str = include_str!("input/day_1.txt");
         assert_eq!(part_2(&parse(INPUT_DATA)), 1158);
     }
