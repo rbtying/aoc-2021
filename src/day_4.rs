@@ -150,10 +150,6 @@ impl Board {
         sum
     }
 
-    // pub fn not_selected(&self) -> impl Iterator<Item = u8> + '_ {
-    //     (0..5).flat_map(move |i| (0..5).filter(move |j| self.hits & (1 << i * 5 + j) != 0).map(|j| self.board[i][j]))
-    // }
-
     pub fn is_bingo(&self) -> bool {
         // Horizontals
         (0..5).any(|v| self.hits & (0b11111 << v * 5) == (0b11111 << v * 5)) ||
