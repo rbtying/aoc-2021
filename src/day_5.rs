@@ -111,14 +111,6 @@ impl Line {
         }
     }
 
-    /// Returns min_x, max_x, min_y, max_y
-    pub fn bounds(&self) -> ((usize, usize), (usize, usize)) {
-        (
-            (self.start.0.min(self.end.0), self.start.0.max(self.end.0)),
-            (self.start.1.min(self.end.0), self.start.1.max(self.end.1)),
-        )
-    }
-
     pub fn is_horizontal(&self) -> bool {
         self.start.1 == self.end.1
     }
