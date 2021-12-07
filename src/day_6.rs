@@ -119,7 +119,7 @@ pub fn part_2(s: &str) -> usize {
         *fish_reduced.entry(f).or_default() += 1;
     }
 
-    for i in 0..256 {
+    for _ in 0..256 {
         let at_zero = fish_reduced.remove(&0);
         for j in 1..=8 {
             if let Some(v) = fish_reduced.remove(&j) {
