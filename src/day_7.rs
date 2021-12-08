@@ -79,7 +79,7 @@
 // fuel possible so they can make you an escape route! How much fuel must they
 // spend to align to that position?
 
-fn part_1(s: &str) -> u64 {
+pub fn part_1(s: &str) -> u64 {
     let mut positions = s
         .split(",")
         .map(|u| u.parse::<u64>().unwrap())
@@ -100,7 +100,7 @@ fn part_1(s: &str) -> u64 {
     dist
 }
 
-fn part_2(s: &str) -> usize {
+pub fn part_2(s: &str) -> usize {
     let positions = s
         .split(",")
         .map(|u| u.parse::<usize>().unwrap())
