@@ -201,7 +201,7 @@ pub fn part_2(s: &str) -> usize {
             .split_whitespace()
             .map(|s| {
                 let mut chars: Vec<_> = s.chars().collect();
-                chars.sort();
+                chars.sort_unstable();
                 String::from_iter(chars)
             })
             .collect::<Vec<_>>();

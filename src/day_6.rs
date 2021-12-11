@@ -86,7 +86,7 @@ use std::collections::HashMap;
 
 pub fn part_1(s: &str) -> usize {
     let mut fish = s
-        .split(",")
+        .split(',')
         .map(|s| s.parse::<u8>().unwrap())
         .collect::<Vec<_>>();
 
@@ -100,9 +100,7 @@ pub fn part_1(s: &str) -> usize {
                 *f -= 1;
             }
         }
-        for _ in 0..num_new_fish {
-            fish.push(8);
-        }
+        fish.extend((0..num_new_fish).map(|_| 8));
     }
 
     fish.len()
@@ -110,7 +108,7 @@ pub fn part_1(s: &str) -> usize {
 
 pub fn part_2(s: &str) -> usize {
     let fish = s
-        .split(",")
+        .split(',')
         .map(|s| s.parse::<u8>().unwrap())
         .collect::<Vec<_>>();
 

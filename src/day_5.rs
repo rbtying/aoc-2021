@@ -98,7 +98,7 @@ pub struct Line {
 }
 
 impl Line {
-    pub fn from_str(s: &str) -> Line {
+    pub fn new(s: &str) -> Line {
         let (start, end) = s.split_once("->").unwrap();
         let (start_x, start_y) = start.split_once(",").unwrap();
         let (end_x, end_y) = end.split_once(",").unwrap();
@@ -152,20 +152,18 @@ impl Line {
                             .map(move |offset| (self.start.0 + offset, self.start.1 - offset)),
                     )
                 }
+            } else if self.start.1 < self.end.1 {
+                // diagonal up-left at 45 degrees
+                Box::new(
+                    (0..=self.start.0 - self.end.0)
+                        .map(move |offset| (self.start.0 - offset, self.start.1 + offset)),
+                )
             } else {
-                if self.start.1 < self.end.1 {
-                    // diagonal up-left at 45 degrees
-                    Box::new(
-                        (0..=self.start.0 - self.end.0)
-                            .map(move |offset| (self.start.0 - offset, self.start.1 + offset)),
-                    )
-                } else {
-                    // diagonal down-left at 45 degrees
-                    Box::new(
-                        (0..=self.start.0 - self.end.0)
-                            .map(move |offset| (self.start.0 - offset, self.start.1 - offset)),
-                    )
-                }
+                // diagonal down-left at 45 degrees
+                Box::new(
+                    (0..=self.start.0 - self.end.0)
+                        .map(move |offset| (self.start.0 - offset, self.start.1 - offset)),
+                )
             }
         } else {
             unimplemented!()
@@ -174,7 +172,7 @@ impl Line {
 }
 
 pub fn part_1(s: &str) -> usize {
-    let lines = s.lines().map(|s_| Line::from_str(s_));
+    let lines = s.lines().map(Line::new);
     let mut counts: HashMap<(usize, usize), usize> = HashMap::new();
 
     for line in lines {
@@ -189,7 +187,7 @@ pub fn part_1(s: &str) -> usize {
 }
 
 pub fn part_2(s: &str) -> usize {
-    let lines = s.lines().map(|s_| Line::from_str(s_));
+    let lines = s.lines().map(Line::new);
     let mut counts: HashMap<(usize, usize), usize> = HashMap::new();
 
     for line in lines {

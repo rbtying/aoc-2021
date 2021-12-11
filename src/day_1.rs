@@ -140,13 +140,13 @@ pub mod tests {
 
     #[test]
     pub fn test_day_1_part_1() {
-        const INPUT_DATA: &'static str = include_str!("input/day_1.txt");
+        const INPUT_DATA: &str = include_str!("input/day_1.txt");
         assert_eq!(part_1(&parse(INPUT_DATA)), 1184);
     }
 
     #[test]
     pub fn test_day_1_part_2() {
-        const INPUT_DATA: &'static str = include_str!("input/day_1.txt");
+        const INPUT_DATA: &str = include_str!("input/day_1.txt");
         assert_eq!(part_2(&parse(INPUT_DATA)), 1158);
     }
 }

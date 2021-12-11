@@ -81,10 +81,10 @@
 
 pub fn part_1(s: &str) -> u64 {
     let mut positions = s
-        .split(",")
+        .split(',')
         .map(|u| u.parse::<u64>().unwrap())
         .collect::<Vec<_>>();
-    positions.sort();
+    positions.sort_unstable();
     let left = positions.len() / 2;
     let mid = if positions.len() % 2 == 0 {
         positions[left]
@@ -102,7 +102,7 @@ pub fn part_1(s: &str) -> u64 {
 
 pub fn part_2(s: &str) -> usize {
     let positions = s
-        .split(",")
+        .split(',')
         .map(|u| u.parse::<usize>().unwrap())
         .collect::<Vec<_>>();
 
@@ -124,7 +124,7 @@ pub fn part_2(s: &str) -> usize {
         best = curr.min(best);
     }
 
-    return best;
+    best
 }
 
 #[cfg(test)]

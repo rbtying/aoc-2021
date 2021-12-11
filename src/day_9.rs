@@ -191,7 +191,7 @@ pub fn part_2(s: &str) -> usize {
     }
 
     let mut basin_count_values: Vec<usize> = basin_counts.values().copied().collect();
-    basin_count_values.sort();
+    basin_count_values.sort_unstable();
 
     basin_count_values[basin_count_values.len() - 1]
         * basin_count_values[basin_count_values.len() - 2]

@@ -99,12 +99,12 @@ use std::str::FromStr;
 pub fn parse_board<'a, I: Iterator<Item = &'a str>>(mut s: I) -> (I, Board) {
     let mut board = [[0u8; 5]; 5];
 
-    for i in 0..5 {
+    for r in &mut board {
         let l = s.next().unwrap();
         let mut l_it = l.split_whitespace();
 
-        for j in 0..5 {
-            board[i][j] = u8::from_str(l_it.next().unwrap()).unwrap();
+        for c in &mut *r {
+            *c = l_it.next().unwrap().parse().unwrap();
         }
     }
 
@@ -132,7 +132,7 @@ impl Board {
                 }
             }
         }
-        return false;
+        false
     }
 
     pub fn sum_unmarked(&self) -> u64 {
@@ -152,7 +152,7 @@ impl Board {
 
     pub fn is_bingo(&self) -> bool {
         // Horizontals
-        (0..5).any(|v| self.hits & (0b11111 << v * 5) == (0b11111 << v * 5)) ||
+        (0..5).any(|v| self.hits & (0b11111 << (v * 5)) == (0b11111 << (v * 5))) ||
         // Verticals
         (0..5).any(|v| self.hits & (0b100001000010000100001 << v) == (0b100001000010000100001 << v))
     }
@@ -187,7 +187,7 @@ pub fn parse(s: &str) -> (Vec<u8>, Vec<Board>) {
     let numbers = lines
         .next()
         .unwrap()
-        .split(",")
+        .split(',')
         .map(|v| u8::from_str(v).unwrap())
         .collect::<Vec<_>>();
     let mut boards = vec![];
@@ -204,10 +204,8 @@ pub fn parse(s: &str) -> (Vec<u8>, Vec<Board>) {
 pub fn part_1(numbers: Vec<u8>, mut boards: Vec<Board>) -> u64 {
     for number in numbers {
         for board in boards.iter_mut() {
-            if board.hit(number) {
-                if board.is_bingo() {
-                    return number as u64 * board.sum_unmarked();
-                }
+            if board.hit(number) && board.is_bingo() {
+                return number as u64 * board.sum_unmarked();
             }
         }
     }
@@ -221,11 +219,9 @@ pub fn part_2(numbers: Vec<u8>, mut boards: Vec<Board>) -> u64 {
         for (idx, board) in boards.iter_mut().enumerate() {
             if completion_sequence[idx] == 0 {
                 assert!(!board.is_bingo());
-                if board.hit(number) {
-                    if board.is_bingo() {
-                        completion_sequence[idx] = seq_start;
-                        seq_start += 1;
-                    }
+                if board.hit(number) && board.is_bingo() {
+                    completion_sequence[idx] = seq_start;
+                    seq_start += 1;
                 }
             }
         }
