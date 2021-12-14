@@ -170,7 +170,7 @@ pub fn part_1(s: &str) -> usize {
     let mut dots: HashSet<(usize, usize)> = HashSet::new();
     let mut iter = s.lines();
     for line in &mut iter {
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let (x, y) = line.split_once(",").unwrap();
@@ -217,7 +217,7 @@ pub fn part_2(s: &str) -> String {
     let mut dots: HashSet<(usize, usize)> = HashSet::new();
     let mut iter = s.lines();
     for line in &mut iter {
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let (x, y) = line.split_once(",").unwrap();
