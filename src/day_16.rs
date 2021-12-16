@@ -254,16 +254,16 @@ fn parse_packet(iter: &mut impl Iterator<Item = usize>) -> Option<(usize, usize)
             _ => unreachable!(),
         };
         let out = match typ {
-            0 => (operands.into_iter().sum::<usize>()),
-            1 => (operands.into_iter().product::<usize>()),
-            2 => (operands.into_iter().min().unwrap()),
-            3 => (operands.into_iter().max().unwrap()),
-            5 if operands[0] > operands[1] => (1),
-            5 => (0),
-            6 if operands[0] < operands[1] => (1),
-            6 => (0),
-            7 if operands[0] == operands[1] => (1),
-            7 => (0),
+            0 => operands.into_iter().sum::<usize>(),
+            1 => operands.into_iter().product::<usize>(),
+            2 => operands.into_iter().min().unwrap(),
+            3 => operands.into_iter().max().unwrap(),
+            5 if operands[0] > operands[1] => 1,
+            5 => 0,
+            6 if operands[0] < operands[1] => 1,
+            6 => 0,
+            7 if operands[0] == operands[1] => 1,
+            7 => 0,
             _ => unreachable!(),
         };
         Some((version_sum, out))
