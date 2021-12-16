@@ -271,24 +271,14 @@ fn parse_packet(iter: &mut impl Iterator<Item = usize>) -> Option<(usize, usize)
 }
 
 pub fn part_1(s: &str) -> usize {
-    let mut iter = s.trim().chars().flat_map(|c| match c {
-        '0' => vec![0, 0, 0, 0],
-        '1' => vec![0, 0, 0, 1],
-        '2' => vec![0, 0, 1, 0],
-        '3' => vec![0, 0, 1, 1],
-        '4' => vec![0, 1, 0, 0],
-        '5' => vec![0, 1, 0, 1],
-        '6' => vec![0, 1, 1, 0],
-        '7' => vec![0, 1, 1, 1],
-        '8' => vec![1, 0, 0, 0],
-        '9' => vec![1, 0, 0, 1],
-        'A' => vec![1, 0, 1, 0],
-        'B' => vec![1, 0, 1, 1],
-        'C' => vec![1, 1, 0, 0],
-        'D' => vec![1, 1, 0, 1],
-        'E' => vec![1, 1, 1, 0],
-        'F' => vec![1, 1, 1, 1],
-        x => unreachable!("unexpected {}", x),
+    let mut iter = s.trim().chars().flat_map(|c| {
+        let i = c.to_digit(16).unwrap() as usize;
+        [
+            (i & (1 << 3) != 0) as usize,
+            (i & (1 << 2) != 0) as usize,
+            (i & (1 << 1) != 0) as usize,
+            (i & 1 != 0) as usize,
+        ]
     });
 
     let (v, _) = parse_packet(&mut iter).unwrap();
@@ -296,26 +286,15 @@ pub fn part_1(s: &str) -> usize {
 }
 
 pub fn part_2(s: &str) -> usize {
-    let mut iter = s.trim().chars().flat_map(|c| match c {
-        '0' => vec![0, 0, 0, 0],
-        '1' => vec![0, 0, 0, 1],
-        '2' => vec![0, 0, 1, 0],
-        '3' => vec![0, 0, 1, 1],
-        '4' => vec![0, 1, 0, 0],
-        '5' => vec![0, 1, 0, 1],
-        '6' => vec![0, 1, 1, 0],
-        '7' => vec![0, 1, 1, 1],
-        '8' => vec![1, 0, 0, 0],
-        '9' => vec![1, 0, 0, 1],
-        'A' => vec![1, 0, 1, 0],
-        'B' => vec![1, 0, 1, 1],
-        'C' => vec![1, 1, 0, 0],
-        'D' => vec![1, 1, 0, 1],
-        'E' => vec![1, 1, 1, 0],
-        'F' => vec![1, 1, 1, 1],
-        x => unreachable!("unexpected {}", x),
+    let mut iter = s.trim().chars().flat_map(|c| {
+        let i = c.to_digit(16).unwrap() as usize;
+        [
+            (i & (1 << 3) != 0) as usize,
+            (i & (1 << 2) != 0) as usize,
+            (i & (1 << 1) != 0) as usize,
+            (i & 1 != 0) as usize,
+        ]
     });
-
     let (_, v) = parse_packet(&mut iter).unwrap();
     v
 }

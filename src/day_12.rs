@@ -173,6 +173,7 @@
 // Given these new rules, how many paths through this cave system are there?
 
 use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
 
 pub fn part_1(s: &str) -> usize {
     let mut edges: HashMap<String, Vec<String>> = HashMap::new();
@@ -212,66 +213,81 @@ pub fn part_1(s: &str) -> usize {
 }
 
 pub fn part_2(s: &str) -> usize {
-    let mut edges: HashMap<String, Vec<String>> = HashMap::new();
+    let mut edges: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut nodes: HashMap<String, usize> = HashMap::new();
+    let mut capitalized = vec![];
     for line in s.lines() {
         let (from, to) = line.split_once("-").unwrap();
-        edges
-            .entry(from.to_owned())
-            .or_default()
-            .push(to.to_owned());
-        edges
-            .entry(to.to_owned())
-            .or_default()
-            .push(from.to_owned());
+        if !nodes.contains_key(from) {
+            nodes.insert(from.to_string(), capitalized.len());
+            capitalized.push(from.chars().next().unwrap().is_uppercase());
+        }
+        if !nodes.contains_key(to) {
+            nodes.insert(to.to_string(), capitalized.len());
+            capitalized.push(to.chars().next().unwrap().is_uppercase());
+        }
+
+        edges.entry(nodes[from]).or_default().push(nodes[to]);
+        edges.entry(nodes[to]).or_default().push(nodes[from]);
     }
 
     #[derive(Clone)]
     struct Path {
         visited_twice: bool,
-        visited: HashSet<String>,
-        last: String,
+        visited: Rc<HashSet<usize>>,
+        last: usize,
     }
 
     impl Path {
-        pub fn new(s: String) -> Self {
+        pub fn new(s: usize) -> Self {
             Path {
                 visited_twice: false,
-                visited: vec![s.clone()].into_iter().collect(),
+                visited: Rc::new(vec![s].into_iter().collect()),
                 last: s,
             }
         }
 
-        pub fn extend(&self, s: String) -> Self {
-            let mut p = self.clone();
-            if p.visited.contains(&s) && s.chars().next().unwrap().is_lowercase() {
-                p.visited_twice = true;
+        pub fn extend(&self, s: usize, capital: bool) -> Self {
+            let is_revisit = self.visited.contains(&s) && !capital;
+            let visited_twice = self.visited_twice || is_revisit;
+
+            if !capital && !is_revisit {
+                let mut visited_: HashSet<_> = (*self.visited).clone();
+                visited_.insert(s);
+                Self {
+                    visited: Rc::new(visited_),
+                    last: s,
+                    visited_twice,
+                }
+            } else {
+                Self {
+                    visited: Rc::clone(&self.visited),
+                    last: s,
+                    visited_twice,
+                }
             }
-            p.visited.insert(s.clone());
-            p.last = s;
-            p
         }
     }
 
     // Explore every path from start to end
-    let mut stk = vec![Path::new("start".to_owned())];
+    let end = nodes["end"];
+    let start = nodes["start"];
+    let mut stk = vec![Path::new(start)];
     let mut num_paths = 0;
     while let Some(path) = stk.pop() {
-        if path.last == "end" {
+        if path.last == end {
             num_paths += 1;
         } else if let Some(edges_) = edges.get(&path.last) {
             for to in edges_ {
-                if to == "start" {
+                if *to == start {
                     continue;
                 }
 
-                if to.chars().next().unwrap().is_lowercase()
-                    && path.visited_twice
-                    && path.visited.contains(to)
-                {
+                if !capitalized[*to] && path.visited_twice && path.visited.contains(to) {
                     continue;
                 }
 
-                stk.push(path.extend(to.to_owned()));
+                stk.push(path.extend(*to, capitalized[*to]));
             }
         }
     }
