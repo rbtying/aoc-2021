@@ -255,7 +255,6 @@ pub fn part_2(s: &str) -> isize {
         }
     }
 
-    // the highest possible y value must be positive
     let mut found = HashSet::new();
     for dy in -100..100 {
         for dx in 0..500 {
