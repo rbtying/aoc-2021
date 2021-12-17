@@ -196,7 +196,7 @@ fn simulate(
             break Some(peak);
         }
 
-        if y < min_y && dy < 0 {
+        if y < min_y && dy < 0 || x > max_x {
             break None;
         }
     }
@@ -224,7 +224,7 @@ pub fn part_1(s: &str) -> isize {
 
     // the highest possible y value must be positive
     let mut peak = 0;
-    for dy in 0..500 {
+    for dy in 0..100 {
         for dx in 0..292 {
             if let Some(v) = simulate(dx, dy, min_x, max_x, min_y, max_y) {
                 peak = peak.max(v);
@@ -257,8 +257,8 @@ pub fn part_2(s: &str) -> isize {
 
     // the highest possible y value must be positive
     let mut found = HashSet::new();
-    for dy in -500..500 {
-        for dx in 0..1000 {
+    for dy in -100..100 {
+        for dx in 0..500 {
             if simulate(dx, dy, min_x, max_x, min_y, max_y).is_some() {
                 found.insert((dx, dy));
             }
