@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
-enum V {
+pub enum V {
     Open,
     Delim,
     Literal(usize),
@@ -89,6 +89,7 @@ fn reduce(mut v: Vec<V>) -> (Vec<V>, bool) {
         }
     }
 
+    // eprint!("{:?} ", action);
     match action {
         Some(Action::Split { at, val }) => {
             let lhs = val / 2;
@@ -134,6 +135,7 @@ fn reduce(mut v: Vec<V>) -> (Vec<V>, bool) {
 fn reduced(mut v: Vec<V>) -> Vec<V> {
     loop {
         let (v_, reduced) = reduce(v);
+        // print_val(&v_);
         v = v_;
         if !reduced {
             break;
