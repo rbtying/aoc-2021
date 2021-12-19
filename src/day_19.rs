@@ -419,16 +419,6 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-pub fn relative_to(
-    beacons: &[(isize, isize, isize)],
-    beacon: (isize, isize, isize),
-) -> impl Iterator<Item = (isize, isize, isize)> + '_ {
-    let (x_, y_, z_) = beacon;
-    beacons
-        .iter()
-        .map(move |&(x, y, z)| (x - x_, y - y_, z - z_))
-}
-
 type Mat3 = [[isize; 3]; 3];
 type Vec3 = [isize; 3];
 
