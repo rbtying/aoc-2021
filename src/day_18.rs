@@ -9,8 +9,7 @@ pub enum V {
 fn parse_val(s: impl IntoIterator<Item = char>) -> Vec<V> {
     let mut v = vec![];
     let mut digits = None;
-    let mut s = s.into_iter();
-    while let Some(c) = s.next() {
+    for c in s {
         match c {
             '[' => {
                 v.push(V::Open);
@@ -77,19 +76,15 @@ fn reduce(mut v: Vec<V>) -> (Vec<V>, bool) {
     }
     if action.is_none() {
         for (idx, vv) in v.iter().enumerate() {
-            match vv {
-                V::Literal(x) => {
-                    if *x >= 10 {
-                        action = Some(Action::Split { at: idx, val: *x });
-                        break;
-                    }
+            if let V::Literal(x) = vv {
+                if *x >= 10 {
+                    action = Some(Action::Split { at: idx, val: *x });
+                    break;
                 }
-                _ => (),
             }
         }
     }
 
-    // eprint!("{:?} ", action);
     match action {
         Some(Action::Split { at, val }) => {
             let lhs = val / 2;
@@ -120,9 +115,9 @@ fn reduce(mut v: Vec<V>) -> (Vec<V>, bool) {
                 }
             }
 
-            for idx in (at + 1)..v.len() {
-                if let V::Literal(x) = v[idx] {
-                    v[idx] = V::Literal(x + rhs);
+            for vv in v.iter_mut().skip(at + 1) {
+                if let V::Literal(x) = vv {
+                    *x += rhs;
                     break;
                 }
             }
@@ -162,7 +157,7 @@ pub fn part_1(s: &str) -> usize {
     let first = iter.next().unwrap();
     let mut v = reduced(parse_val(first.chars()));
 
-    while let Some(next) = iter.next() {
+    for next in iter { 
         let v2 = reduced(parse_val(next.chars()));
         v.insert(0, V::Open);
         v.push(V::Delim);
