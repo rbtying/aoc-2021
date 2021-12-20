@@ -174,51 +174,42 @@ pub fn print_img(img: &HashSet<(isize, isize)>) {
 pub fn get_pix(
     img: &HashSet<(isize, isize)>,
     coord: (isize, isize),
-    border_x: (isize, isize),
-    border_y: (isize, isize),
-    border_val: usize,
+    bounds: (isize, isize, isize, isize),
+    border_val: bool,
 ) -> usize {
-    let mut s = String::new();
+    let mut v = 0;
 
     for offset_x in [-1, 0, 1] {
         for offset_y in [-1, 0, 1] {
             let pos = (coord.0 + offset_x, coord.1 + offset_y);
+            let in_bounds = (pos.0 >= bounds.0 && pos.0 <= bounds.1)
+                && (pos.1 >= bounds.2 && pos.1 <= bounds.3);
             if img.contains(&pos) {
-                s.push('1');
-            } else if (pos.0 >= border_x.0 && pos.0 <= border_x.1)
-                && (pos.1 >= border_y.0 && pos.1 <= border_y.1)
-            {
-                s.push('0');
-            } else if border_val == 1 {
-                s.push('1');
-            } else {
-                s.push('0');
+                v |= 1;
+            } else if !in_bounds && border_val {
+                v |= 1;
             }
+            v <<= 1;
         }
     }
 
-    usize::from_str_radix(&s, 2).unwrap()
+    v >> 1
 }
 
 fn enhance_img(
     img: &HashSet<(isize, isize)>,
-    algo: &[usize],
-    border_val: usize,
-) -> (HashSet<(isize, isize)>, usize) {
-    let min_x = img.iter().map(|(x, _)| *x).min().unwrap();
-    let max_x = img.iter().map(|(x, _)| *x).max().unwrap();
-    let min_y = img.iter().map(|(y, _)| *y).min().unwrap();
-    let max_y = img.iter().map(|(y, _)| *y).max().unwrap();
-
-    let border_x = (min_x, max_x);
-    let border_y = (min_y, max_y);
+    algo: &[bool],
+    bounds: (isize, isize, isize, isize),
+    border_val: bool,
+) -> (HashSet<(isize, isize)>, bool, (isize, isize, isize, isize)) {
+    let (min_x, max_x, min_y, max_y) = bounds;
 
     let mut out = HashSet::new();
 
     for x in min_x - 1..=max_x + 1 {
         for y in min_y - 1..=max_y + 1 {
-            let idx = get_pix(img, (x, y), border_x, border_y, border_val);
-            if algo[idx] == 1 {
+            let idx = get_pix(img, (x, y), bounds, border_val);
+            if algo[idx] {
                 out.insert((x, y));
             }
         }
@@ -226,7 +217,8 @@ fn enhance_img(
 
     (
         out,
-        algo[get_pix(img, (min_x - 1, min_y - 1), border_x, border_y, border_val)],
+        algo[get_pix(img, (min_x - 1, min_y - 1), bounds, border_val)],
+        (min_x - 1, max_x + 1, min_y - 1, max_y + 1),
     )
 }
 
@@ -237,27 +229,36 @@ pub fn part_1(s: &str) -> usize {
         .unwrap()
         .chars()
         .map(|c| match c {
-            '.' => 0,
-            '#' => 1,
+            '.' => false,
+            '#' => true,
             _ => unreachable!(),
         })
-        .collect::<Vec<usize>>();
+        .collect::<Vec<bool>>();
     assert_eq!(algo.len(), 512);
 
     let _ = iter.next().unwrap();
 
     let mut lit: HashSet<(isize, isize)> = HashSet::new();
 
+    let mut max_row = 0;
+    let mut max_col = 0;
     for (row, line) in iter.enumerate() {
         for (col, c) in line.chars().enumerate() {
             if c == '#' {
                 lit.insert((row as isize, col as isize));
             }
+            max_col = max_col.max(col);
         }
+        max_row = row;
     }
 
-    let (e1, e1b) = enhance_img(&lit, &algo, 0);
-    let (e2, _) = enhance_img(&e1, &algo, e1b);
+    let (e1, e1b, e1bv) = enhance_img(
+        &lit,
+        &algo,
+        (0, max_row as isize, 0, max_col as isize),
+        false,
+    );
+    let (e2, _, _) = enhance_img(&e1, &algo, e1bv, e1b);
 
     e2.len()
 }
@@ -269,28 +270,32 @@ pub fn part_2(s: &str) -> usize {
         .unwrap()
         .chars()
         .map(|c| match c {
-            '.' => 0,
-            '#' => 1,
+            '.' => false,
+            '#' => true,
             _ => unreachable!(),
         })
-        .collect::<Vec<usize>>();
+        .collect::<Vec<bool>>();
     assert_eq!(algo.len(), 512);
 
     let _ = iter.next().unwrap();
 
     let mut lit: HashSet<(isize, isize)> = HashSet::new();
 
+    let mut max_row = 0;
+    let mut max_col = 0;
     for (row, line) in iter.enumerate() {
         for (col, c) in line.chars().enumerate() {
             if c == '#' {
                 lit.insert((row as isize, col as isize));
             }
+            max_col = max_col.max(col);
         }
+        max_row = row;
     }
 
-    let mut e = (lit, 0);
+    let mut e = (lit, false, (0, max_row as isize, 0, max_col as isize));
     for _ in 0..50 {
-        e = enhance_img(&e.0, &algo, e.1);
+        e = enhance_img(&e.0, &algo, e.2, e.1);
     }
     print_img(&e.0);
 
