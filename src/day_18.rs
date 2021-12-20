@@ -157,7 +157,7 @@ pub fn part_1(s: &str) -> usize {
     let first = iter.next().unwrap();
     let mut v = reduced(parse_val(first.chars()));
 
-    for next in iter { 
+    for next in iter {
         let v2 = reduced(parse_val(next.chars()));
         v.insert(0, V::Open);
         v.push(V::Delim);
