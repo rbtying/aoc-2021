@@ -525,6 +525,20 @@ fn common_enough(a: &[Vec3], b: &[Vec3]) -> Option<(Vec<Vec3>, Vec3)> {
     None
 }
 
+fn fingerprint(points: &[Vec3]) -> HashSet<isize> {
+    let mut distances = HashSet::new();
+    for (i, p_i) in points.iter().enumerate() {
+        for p_j in points.iter().skip(i + 1) {
+            let mut d = 0;
+            for k in 0..3 {
+                d += p_i[k].max(p_j[k]) - p_i[k].min(p_j[k]);
+            }
+            distances.insert(d);
+        }
+    }
+    distances
+}
+
 fn shared(s: &str) -> (HashMap<String, Arc<Vec<Vec3>>>, Vec<Vec3>) {
     let mut scanners = HashMap::new();
     let mut iter = s.lines();
@@ -550,6 +564,32 @@ fn shared(s: &str) -> (HashMap<String, Arc<Vec<Vec3>>>, Vec<Vec3>) {
     }
     scanners.insert(cur_scanner.0, Arc::new(cur_scanner.1));
 
+    let mut fingerprints = HashMap::new();
+    for (n, v) in &scanners {
+        fingerprints.insert(n.to_owned(), fingerprint(v));
+    }
+
+    let scanner_keys = scanners.keys().cloned().collect::<Vec<_>>();
+    let mut viable_searches: HashMap<String, Vec<String>> = HashMap::new();
+
+    for (i, s1) in scanner_keys.iter().enumerate() {
+        for s2 in scanner_keys.iter().skip(i + 1) {
+            let num_overlaps = fingerprints[s1].intersection(&fingerprints[s2]).count();
+            // Overlaps are orientation-invariant. We expect that the 12 points overlap one
+            // another, and that 12*(11)/2 = 66 of them to exactly match.
+            if num_overlaps >= 66 {
+                viable_searches
+                    .entry(s1.to_owned())
+                    .or_default()
+                    .push(s2.to_owned());
+                viable_searches
+                    .entry(s2.to_owned())
+                    .or_default()
+                    .push(s1.to_owned());
+            }
+        }
+    }
+
     remapped_scanners.insert(
         "--- scanner 0 ---".to_owned(),
         Arc::clone(&scanners["--- scanner 0 ---"]),
@@ -557,15 +597,13 @@ fn shared(s: &str) -> (HashMap<String, Arc<Vec<Vec3>>>, Vec<Vec3>) {
 
     let mut deltas = vec![];
 
-    let scanner_keys = scanners.keys().cloned().collect::<Vec<_>>();
-
     while done_scanners.len() < scanners.len() {
         for scanner in &scanner_keys {
             if remapped_scanners.contains_key(scanner) && !done_scanners.contains(scanner) {
                 eprintln!("{}", scanner);
 
                 let mut work = vec![];
-                for scanner2 in &scanner_keys {
+                for scanner2 in &viable_searches[scanner] {
                     if scanner != scanner2 && !remapped_scanners.contains_key(scanner2) {
                         let scanner2 = scanner2.clone();
                         work.push((scanner, scanner2));
