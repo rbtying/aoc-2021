@@ -191,8 +191,10 @@ pub fn part_2(s: &str) -> usize {
 
     #[derive(Copy, Clone)]
     enum Roll {
-        P1(u8, usize),
-        P2(u8, usize),
+        P1Roll,
+        P1Score(usize),
+        P2Roll,
+        P2Score(usize),
     }
 
     #[derive(Copy, Clone)]
@@ -201,7 +203,6 @@ pub fn part_2(s: &str) -> usize {
         p2_score: usize,
         p1_pos: usize,
         p2_pos: usize,
-        dice_roll_count: usize,
         roll: Roll,
         win_multiplier: usize,
     }
@@ -211,8 +212,7 @@ pub fn part_2(s: &str) -> usize {
         p2_score: 0,
         p1_pos: p1_position,
         p2_pos: p2_position,
-        roll: Roll::P1(0, 0),
-        dice_roll_count: 0,
+        roll: Roll::P1Roll,
         win_multiplier: 1,
     }];
 
@@ -231,19 +231,18 @@ pub fn part_2(s: &str) -> usize {
 
     while let Some(s) = stk.pop() {
         match s.roll {
-            Roll::P1(x, v) if x < 3 => {
+            Roll::P1Roll => {
                 for (i, x) in d.iter().enumerate().skip(3) {
                     if *x > 0 {
                         stk.push(State {
-                            dice_roll_count: s.dice_roll_count + 3,
-                            roll: Roll::P1(3, v + i),
+                            roll: Roll::P1Score(i),
                             win_multiplier: s.win_multiplier * *x as usize,
                             ..s
                         });
                     }
                 }
             }
-            Roll::P1(3, v) => {
+            Roll::P1Score(v) => {
                 let mut p1_position = s.p1_pos + v;
                 while p1_position > 10 {
                     p1_position -= 10;
@@ -256,24 +255,23 @@ pub fn part_2(s: &str) -> usize {
                     stk.push(State {
                         p1_pos: p1_position,
                         p1_score,
-                        roll: Roll::P2(0, 0),
+                        roll: Roll::P2Roll,
                         ..s
                     })
                 }
             }
-            Roll::P2(x, v) if x < 3 => {
+            Roll::P2Roll => {
                 for (i, x) in d.iter().enumerate().skip(3) {
                     if *x > 0 {
                         stk.push(State {
-                            dice_roll_count: s.dice_roll_count + 3,
-                            roll: Roll::P2(3, v + i),
+                            roll: Roll::P2Score(i),
                             win_multiplier: s.win_multiplier * *x as usize,
                             ..s
                         });
                     }
                 }
             }
-            Roll::P2(3, v) => {
+            Roll::P2Score(v) => {
                 let mut p2_position = s.p2_pos + v;
                 while p2_position > 10 {
                     p2_position -= 10;
@@ -286,12 +284,11 @@ pub fn part_2(s: &str) -> usize {
                     stk.push(State {
                         p2_pos: p2_position,
                         p2_score,
-                        roll: Roll::P1(0, 0),
+                        roll: Roll::P1Roll,
                         ..s
                     })
                 }
             }
-            _ => unreachable!(),
         }
     }
 
