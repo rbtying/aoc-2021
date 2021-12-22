@@ -203,7 +203,7 @@
 
 // Starting again with all cubes off, execute all reboot steps. Afterward,
 // considering all cubes, how many cubes are on?
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct Ranges {
@@ -309,12 +309,6 @@ impl Ranges {
 struct IndexedRanges {
     max_id: usize,
     on: HashMap<usize, Ranges>,
-    sorted_by_x_min: BTreeMap<isize, Vec<usize>>,
-    sorted_by_y_min: BTreeMap<isize, Vec<usize>>,
-    sorted_by_z_min: BTreeMap<isize, Vec<usize>>,
-    sorted_by_x_max: BTreeMap<isize, Vec<usize>>,
-    sorted_by_y_max: BTreeMap<isize, Vec<usize>>,
-    sorted_by_z_max: BTreeMap<isize, Vec<usize>>,
 }
 
 impl IndexedRanges {
@@ -322,12 +316,6 @@ impl IndexedRanges {
         Self {
             max_id: 0,
             on: HashMap::new(),
-            sorted_by_x_min: BTreeMap::new(),
-            sorted_by_y_min: BTreeMap::new(),
-            sorted_by_z_min: BTreeMap::new(),
-            sorted_by_x_max: BTreeMap::new(),
-            sorted_by_y_max: BTreeMap::new(),
-            sorted_by_z_max: BTreeMap::new(),
         }
     }
 
@@ -336,81 +324,17 @@ impl IndexedRanges {
         self.max_id += 1;
 
         self.on.insert(id, r);
-        self.sorted_by_x_min.entry(r.x_min).or_default().push(id);
-        self.sorted_by_y_min.entry(r.y_min).or_default().push(id);
-        self.sorted_by_z_min.entry(r.z_min).or_default().push(id);
-        self.sorted_by_x_max.entry(r.x_max).or_default().push(id);
-        self.sorted_by_y_max.entry(r.y_max).or_default().push(id);
-        self.sorted_by_z_max.entry(r.z_max).or_default().push(id);
     }
 
     pub fn find_overlaps(&mut self, r: Ranges) -> Vec<(usize, Ranges)> {
-        let mut viable: HashSet<usize> = HashSet::new();
-
-        viable.extend(
-            self.sorted_by_x_min
-                .range(&r.x_min..=&r.x_max)
-                .flat_map(|(_, ids)| ids),
-        );
-        viable.extend(
-            self.sorted_by_y_min
-                .range(&r.y_min..=&r.y_max)
-                .flat_map(|(_, ids)| ids),
-        );
-        viable.extend(
-            self.sorted_by_z_min
-                .range(&r.z_min..=&r.z_max)
-                .flat_map(|(_, ids)| ids),
-        );
-        viable.extend(
-            self.sorted_by_x_max
-                .range(&r.x_min..=&r.x_max)
-                .flat_map(|(_, ids)| ids),
-        );
-        viable.extend(
-            self.sorted_by_y_max
-                .range(&r.y_min..=&r.y_max)
-                .flat_map(|(_, ids)| ids),
-        );
-        viable.extend(
-            self.sorted_by_z_max
-                .range(&r.z_min..=&r.z_max)
-                .flat_map(|(_, ids)| ids),
-        );
-
-        viable
-            .into_iter()
-            .flat_map(|i| self.on[&i].overlap(r).map(|o| (i, o)))
+        self.on
+            .keys()
+            .flat_map(|i| self.on[i].overlap(r).map(|o| (*i, o)))
             .collect()
     }
 
     pub fn remove(&mut self, id: usize) -> Ranges {
-        let v = self.on.remove(&id).unwrap();
-        self.sorted_by_x_min
-            .get_mut(&v.x_min)
-            .unwrap()
-            .retain(|i| *i != id);
-        self.sorted_by_y_min
-            .get_mut(&v.y_min)
-            .unwrap()
-            .retain(|i| *i != id);
-        self.sorted_by_z_min
-            .get_mut(&v.z_min)
-            .unwrap()
-            .retain(|i| *i != id);
-        self.sorted_by_x_max
-            .get_mut(&v.x_max)
-            .unwrap()
-            .retain(|i| *i != id);
-        self.sorted_by_y_max
-            .get_mut(&v.y_max)
-            .unwrap()
-            .retain(|i| *i != id);
-        self.sorted_by_z_max
-            .get_mut(&v.z_max)
-            .unwrap()
-            .retain(|i| *i != id);
-        v
+        self.on.remove(&id).unwrap()
     }
 
     pub fn contents(&self) -> impl Iterator<Item = Ranges> + '_ {
