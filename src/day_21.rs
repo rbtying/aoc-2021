@@ -189,6 +189,7 @@ pub fn part_2(s: &str) -> usize {
         .parse()
         .unwrap();
 
+    #[allow(clippy::enum_variant_names)]
     #[derive(Copy, Clone)]
     enum Roll {
         P1Roll,

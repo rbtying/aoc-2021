@@ -184,9 +184,7 @@ pub fn get_pix(
             let pos = (coord.0 + offset_x, coord.1 + offset_y);
             let in_bounds = (pos.0 >= bounds.0 && pos.0 <= bounds.1)
                 && (pos.1 >= bounds.2 && pos.1 <= bounds.3);
-            if img.contains(&pos) {
-                v |= 1;
-            } else if !in_bounds && border_val {
+            if img.contains(&pos) || (!in_bounds && border_val) {
                 v |= 1;
             }
             v <<= 1;
@@ -196,6 +194,7 @@ pub fn get_pix(
     v >> 1
 }
 
+#[allow(clippy::type_complexity)]
 fn enhance_img(
     img: &HashSet<(isize, isize)>,
     algo: &[bool],
