@@ -60,7 +60,7 @@
 //     not move again until they can move fully into a room.)
 
 // In the above example, the amphipods can be organized using a minimum of 12521
-// energy. 
+// energy.
 
 // What is the least energy required to organize the amphipods?
 
@@ -101,7 +101,6 @@
 
 // Using the initial configuration from the full diagram, what is the least
 // energy required to organize the amphipods?
-
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
