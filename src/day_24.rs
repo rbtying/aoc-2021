@@ -83,7 +83,6 @@
 // To enable as many submarine features as possible, find the largest valid fourteen-digit model
 // number that contains no 0 digits. What is the largest model number accepted by MONAD?
 
-
 // --- Part Two ---
 // As the submarine starts booting up things like the Retro Encabulator, you realize that maybe you
 // don't need all these submarine features after all.
@@ -635,7 +634,7 @@ pub fn solve(
             let n = z.replace(&from, to);
             if n != *z {
                 did_something = true;
-                //eprintln!("\t= {:?}", n);
+                println!("\t= {:?}", n);
                 analysis.set_z_value(idx, n.clone());
             }
         }
@@ -647,7 +646,7 @@ pub fn solve(
             let n = z.replace(&from, to);
             if n != *z {
                 did_something = true;
-                //eprintln!("\t= {:?}", n);
+                eprintln!("\t= {:?}", n);
                 analysis.set_z_value(idx, n.clone());
             }
         }
@@ -657,7 +656,7 @@ pub fn solve(
             let n = z.distribute_divs();
             if n != *z {
                 did_something = true;
-                //eprintln!("\t= {:?}", n);
+                eprintln!("\t= {:?}", n);
                 analysis.set_z_value(idx, n.clone());
             } else {
                 break;
@@ -749,6 +748,11 @@ fn common(s: &str) -> (Vec<Instruction>, HashMap<usize, Vec<isize>>) {
                 break;
             }
         }
+    }
+    eprintln!();
+    eprintln!("viable mappings");
+    for i in 0..14 {
+        eprintln!("IN[{}]: {:?}", i, viable[&i]);
     }
 
     (prog, viable)
